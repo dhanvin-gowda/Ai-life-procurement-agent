@@ -1,8 +1,9 @@
 "use client";
-import Link from "next/link"
+
+import Link from "next/link";
 import { useState } from "react";
 
-export default function LoginPage() {
+export default function Signuppage() {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -155,11 +156,11 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <div className="spinner" />
-                  loging in…
+                  signing up…
                 </>
               ) : (
                 <>
-                login
+                signup
                   <svg
                     className="arrow-icon"
                     width="17"
@@ -174,10 +175,11 @@ export default function LoginPage() {
                     <line x1="5" y1="12" x2="19" y2="12" />
                     <polyline points="12 5 19 12 12 19" />
                   </svg>
+                  
                 </>
               )}
             </button>
-            <p className="auth-switch">Don't have an account? <Link href="/signup">signup</Link></p>
+             <p className="auth-switch">Already have an account? <Link href="/login">login</Link></p>
           </form>
         </div>
       </div>
