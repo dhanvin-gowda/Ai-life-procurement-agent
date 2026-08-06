@@ -4,7 +4,7 @@ import SignupForm from "./signup-form";
 
 export default async function Signuppage() {
   if (await isAuthenticated()) {
-    redirect("/dashboard");
+    redirect("/select-product");
   }
 
   return <SignupForm />;
