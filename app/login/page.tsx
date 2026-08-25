@@ -4,7 +4,7 @@ import LoginForm from "./login-form";
 
 export default async function LoginPage() {
     if (await isAuthenticated()) {
-    redirect("/dashboard");
+    redirect("/select-product");
   }
 
   return <LoginForm />;

@@ -1,15 +1,13 @@
-import { Mastra } from '@mastra/core'
-import { testAgent } from "./agent/test-agent"
-
-export const mastra = new Mastra({
-  agents: { testAgent },
+import dotenv from "dotenv"
+import { testAgent } from "./agent/select-product-client";
+import { Mastra } from "@mastra/core";
+dotenv.config();
+export const resp = new Mastra({
+  agents:{testAgent}
 })
 
-async function main() {
+const agent = resp.getAgentById('test-agent');
 
-    const agent = mastra.getAgentById("test-agent");
-    const resp = await agent.generate("explain export const mastra = new Mastra({");
-    console.log(resp.text);
-}
+  const response = await agent.generate("what is photosynthesis");
+  console.log(response.text);
 
-main();
