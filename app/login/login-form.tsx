@@ -31,7 +31,7 @@ export default function LoginForm() {
       if (!send_data.ok) {
         setError(data.error || "Login failed. Please try again.");
       } else {
-        router.push("/dashboard");
+        router.push("/select-product");
       }
     } catch {
       setError("Network error. Please try again.");
