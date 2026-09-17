@@ -240,7 +240,7 @@ export async function compareCartItems(cartItems: any[]): Promise<CartCompareRes
   // Attempt live comparison via our Next.js API route
   try {
     const isBrowser = typeof window !== "undefined";
-    const apiUrl = isBrowser ? "/api/quickcommerce" : "http://localhost:3000/api/quickcommerce";
+    const apiUrl = isBrowser ? "/api/quickcommerce" : `${process.env.NEXT_PUBLIC_BASE_URL || "https://ai-life-procurement-agent.onrender.com"}/api/quickcommerce`;
 
     const payloadItems = cartItems.map((item) => ({
       id: item.product?.id || item.id || "",
