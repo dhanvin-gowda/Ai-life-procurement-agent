@@ -369,7 +369,7 @@ export default function CarProduct({
             ) : (
               <>
                 <Zap style={{ width: "16px", height: "16px", fill: "#ffffff" }} />
-                <span>Compare Across 11 Apps</span>
+                <span>Compare</span>
                 <ArrowRight
                   className="arrow-icon"
                   style={{ width: "16px", height: "16px" }}

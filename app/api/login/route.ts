@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { user } from "@/app/backend/database";
+import { user, connectDB } from "@/app/backend/database";
 import { createAuthToken, setAuthCookie } from "@/app/backend/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    await connectDB();
     const { email, password } = await request.json();
 
     const normalizedEmail = email?.trim().toLowerCase();
