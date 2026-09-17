@@ -1,31 +1,36 @@
+import mongoose from "mongoose";
 
-import {Mongoose} from "mongoose";
-const mongoose = new Mongoose()
-mongoose.connect("mongodb://127.0.0.1:27017/logindetails")
-.then(()=>console.log("connected"))
-.catch(err=>console.log(err))
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/logindetails";
 
-interface schema {
-    email:string,
-    password:string,
+interface UserDocument {
+  email: string;
+  password: string;
 }
 
-const userschema = new mongoose.Schema<schema>(
-   {
-    email:{
-        type:String,
-        required:true,
-        unique:true,
+const userSchema = new mongoose.Schema<UserDocument>(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    password:{
-        type:String,
-        required:true,
-    }
+    password: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-   }
-)
+if (mongoose.connection.readyState === 0) {
+  mongoose
+    .connect(MONGODB_URI)
+    .then(() => console.log("MongoDB connected successfully"))
+    .catch((err) => console.error("MongoDB connection error:", err));
+}
 
-const user = mongoose.model("logindetails",userschema)
+const user =
+  mongoose.models.logindetails ||
+  mongoose.model<UserDocument>("logindetails", userSchema);
 
-export { user }
-
+export { user };

@@ -36,7 +36,7 @@ export default function SignupForm() {
       if (!res.ok) {
         setError(data.error || "Signup failed. Please try again.");
       } else {
-        router.push("/dashboard");
+        router.push("/select-product");
       }
     } catch {
       setError("Network error. Please try again.");
@@ -47,178 +47,179 @@ export default function SignupForm() {
 
   return (
     <div className="login-root">
-        {/* Decorative blobs */}
-        <div className="blob blob-1" />
-        <div className="blob blob-2" />
+      {/* Decorative blobs */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
 
-        <div className="login-card">
-          {/* CPU Icon */}
-          <div className="icon-wrap">
-            <div className="icon-box">
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#0ea5c9"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="6.5" y="6.5" width="11" height="11" rx="1.5" />
-                {/* Top pins */}
-                <line x1="9" y1="6.5" x2="9" y2="3.5" />
-                <line x1="12" y1="6.5" x2="12" y2="3.5" />
-                <line x1="15" y1="6.5" x2="15" y2="3.5" />
-                {/* Bottom pins */}
-                <line x1="9" y1="17.5" x2="9" y2="20.5" />
-                <line x1="12" y1="17.5" x2="12" y2="20.5" />
-                <line x1="15" y1="17.5" x2="15" y2="20.5" />
-                {/* Left pins */}
-                <line x1="6.5" y1="9" x2="3.5" y2="9" />
-                <line x1="6.5" y1="12" x2="3.5" y2="12" />
-                <line x1="6.5" y1="15" x2="3.5" y2="15" />
-                {/* Right pins */}
-                <line x1="17.5" y1="9" x2="20.5" y2="9" />
-                <line x1="17.5" y1="12" x2="20.5" y2="12" />
-                <line x1="17.5" y1="15" x2="20.5" y2="15" />
-                {/* Inner square */}
-                <rect x="9.5" y="9.5" width="5" height="5" rx="0.5" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Title */}
-          <div className="login-title">
-            <h1>AI Life Procurement</h1>
-            <p>Agent Portal</p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} noValidate>
-            
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">
-                Email
-              </label>
-              <div className="input-wrap">
-                <input
-                  id="email"
-                  type="email"
-                  className="form-input"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="password">
-                Password
-              </label>
-              <div className="input-wrap">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  className="form-input has-icon"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="eye-btn"
-                  onClick={
-                    
-                    () => {setShowPassword((prev) => !prev);
-                      setEmail("");
-                      setPassword("");
-                    
-                    }}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    /* Eye-off */
-                    <svg
-                      width="17"
-                      height="17"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-    <circle cx="12" cy="12" r="3" />
-
-                    </svg>
-                  ) : (
-                    /* Eye */
-                    <svg
-                      width="17"
-                      height="17"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-         <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-    <path d="M1 12s4-8 11-8a10.45 10.45 0 0 1 4.14.85m1.39 1.39A18.5 18.5 0 0 1 23 12s-4 8-11 8a10.45 10.45 0 0 1-4.1-.85" />
-    <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Sign In Button */}
-            {error && <p className="form-error">{error}</p>}
-            {success && <p className="form-success">{success}</p>}
-            <button
-              type="submit"
-              className="btn-signin"
-              disabled={isLoading}
-              aria-label="Sign in"
+      <div className="login-card">
+        {/* CPU Icon */}
+        <div className="icon-wrap">
+          <div className="icon-box">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#0ea5c9"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              {isLoading ? (
-                <>
-                  <div className="spinner" />
-                  signing up…
-                </>
-              ) : (
-                <>
-                signup
+              <rect x="6.5" y="6.5" width="11" height="11" rx="1.5" />
+              {/* Top pins */}
+              <line x1="9" y1="6.5" x2="9" y2="3.5" />
+              <line x1="12" y1="6.5" x2="12" y2="3.5" />
+              <line x1="15" y1="6.5" x2="15" y2="3.5" />
+              {/* Bottom pins */}
+              <line x1="9" y1="17.5" x2="9" y2="20.5" />
+              <line x1="12" y1="17.5" x2="12" y2="20.5" />
+              <line x1="15" y1="17.5" x2="15" y2="20.5" />
+              {/* Left pins */}
+              <line x1="6.5" y1="9" x2="3.5" y2="9" />
+              <line x1="6.5" y1="12" x2="3.5" y2="12" />
+              <line x1="6.5" y1="15" x2="3.5" y2="15" />
+              {/* Right pins */}
+              <line x1="17.5" y1="9" x2="20.5" y2="9" />
+              <line x1="17.5" y1="12" x2="20.5" y2="12" />
+              <line x1="17.5" y1="15" x2="20.5" y2="15" />
+              {/* Inner square */}
+              <rect x="9.5" y="9.5" width="5" height="5" rx="0.5" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="login-title">
+          <h1>AI Life Procurement</h1>
+          <p>Agent Portal</p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} noValidate>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="email">
+              Email
+            </label>
+            <div className="input-wrap">
+              <input
+                id="email"
+                type="email"
+                className="form-input"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="password">
+              Password
+            </label>
+            <div className="input-wrap">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className="form-input has-icon"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                className="eye-btn"
+                onClick={
+
+                  () => {
+                    setShowPassword((prev) => !prev);
+                    setEmail("");
+                    setPassword("");
+
+                  }}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  /* Eye-off */
                   <svg
-                    className="arrow-icon"
                     width="17"
                     height="17"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2.5"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+
                   </svg>
-                  
-                </>
-              )}
-            </button>
-             <p className="auth-switch">Already have an account? <Link href="/login">login</Link></p>
-          </form>
-        </div>
+                ) : (
+                  /* Eye */
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <path d="M1 12s4-8 11-8a10.45 10.45 0 0 1 4.14.85m1.39 1.39A18.5 18.5 0 0 1 23 12s-4 8-11 8a10.45 10.45 0 0 1-4.1-.85" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Sign In Button */}
+          {error && <p className="form-error">{error}</p>}
+          {success && <p className="form-success">{success}</p>}
+          <button
+            type="submit"
+            className="btn-signin"
+            disabled={isLoading}
+            aria-label="Sign in"
+          >
+            {isLoading ? (
+              <>
+                <div className="spinner" />
+                signing up…
+              </>
+            ) : (
+              <>
+                signup
+                <svg
+                  className="arrow-icon"
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+
+              </>
+            )}
+          </button>
+          <p className="auth-switch">Already have an account? <Link href="/login">login</Link></p>
+        </form>
       </div>
+    </div>
   );
 }

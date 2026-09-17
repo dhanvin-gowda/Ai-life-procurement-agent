@@ -1,8 +1,11 @@
+import { redirect } from "next/navigation";
+import { isAuthenticated } from "@/app/backend/auth";
 
-import Signuppage from "./signup/page"
-
-export default function Home() {
-  return (
-   <Signuppage/>
-  )
+export default async function Home() {
+  const authed = await isAuthenticated();
+  if (authed) {
+    redirect("/select-product");
+  } else {
+    redirect("/signup");
+  }
 }

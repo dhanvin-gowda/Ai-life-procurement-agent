@@ -1,12 +1,10 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
+const JWT_SECRET = process.env.JWT_TOKEN || "ai-life-procurement-secret-key-2026";
+
 export function createAuthToken(email: string): string {
-  const secret = process.env.JWT_TOKEN;
-  if (!secret) {
-    throw new Error("JWT_TOKEN is not set");
-  }
-  return jwt.sign({ email }, secret, { expiresIn: "7d" });
+  return jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" });
 }
 
 export async function setAuthCookie(token: string): Promise<void> {
@@ -20,19 +18,23 @@ export async function setAuthCookie(token: string): Promise<void> {
   });
 }
 
-export async function isAuthenticated(): Promise<boolean> {
+export async function clearAuthCookie(): Promise<void> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  cookieStore.delete("token");
+}
 
-  if (!token) {
-    return false;
-  }
-
+export async function isAuthenticated(): Promise<boolean> {
   try {
-    jwt.verify(token, process.env.JWT_TOKEN as string);
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (!token) {
+      return false;
+    }
+
+    jwt.verify(token, JWT_SECRET);
     return true;
   } catch {
     return false;
   }
 }
-
