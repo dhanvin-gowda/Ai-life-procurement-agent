@@ -48,6 +48,19 @@ If signup or login returns `503`, inspect the deployment function logs for the u
 
 The API intentionally returns a generic message to the browser while logging the connection failure on the server, so connection strings and credentials are not exposed.
 
+## Persisted cart
+
+Authenticated users have one active cart stored in MongoDB. The cart stores a product snapshot and quantity when an item is added, so refreshing the product page does not lose the selection. Adding the same product again merges its quantity.
+
+The comparison flow stores the latest selected store price under that item as a timestamped snapshot. It includes the store, unit price, item total, optional MRP/deeplink, live-price flag, and capture time. Prices are snapshots and should be refreshed before checkout.
+
+Cart endpoints are available at `/api/cart` for authenticated requests:
+
+- `GET` loads the current cart.
+- `POST` adds or merges an item.
+- `PATCH` updates quantity or a price snapshot.
+- `DELETE` removes an item or clears the cart.
+
 ## Quality checks
 
 ```bash

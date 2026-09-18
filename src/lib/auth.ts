@@ -7,6 +7,24 @@ export function createAuthToken(email: string): string {
   return jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" });
 }
 
+export async function getAuthenticatedUserEmail(): Promise<string | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) return null;
+
+    const payload = jwt.verify(token, JWT_SECRET);
+    if (typeof payload === "object" && payload !== null && "email" in payload) {
+      const email = (payload as { email?: unknown }).email;
+      return typeof email === "string" ? email.toLowerCase() : null;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export async function setAuthCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set("token", token, {
