@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Life Procurement Agent
 
-## Getting Started
+## Local development
 
-First, run the development server:
+Install dependencies and start the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a local `.env.local` file with the server-only variables below. Never commit this file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+MONGODB_URI=mongodb+srv://<user>:<encoded-password>@<cluster>/<database>
+JWT_TOKEN=<long-random-secret>
+```
 
-## Learn More
+`MONGODB_URI` is preferred. The application also supports `MONGODB_PASSWORD` for the configured fallback Atlas user and cluster, but a complete URI is less fragile.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Add the same variables in the deployment provider's project environment settings. Configure them for the environment being deployed, then redeploy:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Vercel:** Project Settings > Environment Variables. Enable the variables for Production and Preview as needed.
+- **Render:** Service > Environment. Add the variables before the next deploy.
 
-## Deploy on Vercel
+The build and start commands are:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm build
+pnpm start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Do not add `NEXT_PUBLIC_` to `MONGODB_URI`, `MONGODB_PASSWORD`, or `JWT_TOKEN`; these values must remain server-only.
+
+## MongoDB Atlas checklist
+
+If signup or login returns `503`, inspect the deployment function logs for the underlying database error. Then verify:
+
+1. The deployment contains `MONGODB_URI` or `MONGODB_PASSWORD` with the exact spelling shown above.
+2. The Atlas database user has read and write access.
+3. The password is URL-encoded inside the URI when it contains reserved characters.
+4. Atlas Network Access allows connections from the deployed provider. For production, use the provider's documented outbound IP strategy rather than relying on a local-only allowlist.
+5. The URI points to the intended Atlas cluster and database.
+
+The API intentionally returns a generic message to the browser while logging the connection failure on the server, so connection strings and credentials are not exposed.
+
+## Quality checks
+
+```bash
+pnpm lint
+pnpm build
+```

@@ -5,7 +5,6 @@ import { createAuthToken, setAuthCookie } from "@/src/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
     const { email, password } = await request.json();
 
     const normalizedEmail = email?.trim().toLowerCase();
@@ -16,6 +15,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    await connectDB();
 
     const existingUser = await user.findOne({ email: normalizedEmail });
 
@@ -45,8 +46,8 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
-      { status: 500 }
+      { error: "Login is temporarily unavailable. Please try again later." },
+      { status: 503 }
     );
   }
 }

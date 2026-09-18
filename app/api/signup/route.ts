@@ -5,7 +5,6 @@ import { createAuthToken, setAuthCookie } from "@/src/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
     const { email, password } = await request.json();
     const normalizedEmail = email?.trim().toLowerCase();
 
@@ -30,6 +29,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    await connectDB();
 
     const search_email = await User.findOne({ email: normalizedEmail });
     if (search_email) {
@@ -68,8 +69,8 @@ export async function POST(request: NextRequest) {
 
     console.error("Signup error:", error);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
-      { status: 500 }
+      { error: "Signup is temporarily unavailable. Please try again later." },
+      { status: 503 }
     );
   }
 }
