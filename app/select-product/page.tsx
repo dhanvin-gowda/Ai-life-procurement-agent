@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { isAuthenticated } from "@/app/backend/auth";
+import { isAuthenticated } from "@/src/lib/auth";
 import SelectProductClient from "./select-product-client";
 
 export default async function SelectProductPage() {

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { isAuthenticated } from "@/app/backend/auth";
+import { isAuthenticated } from "@/src/lib/auth";
 import SignupForm from "./signup-form";
 
 export default async function Signuppage() {
