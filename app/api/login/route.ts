@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { user, connectDB } from "@/app/backend/database";
-import { createAuthToken, setAuthCookie } from "@/app/backend/auth";
+import { user, connectDB } from "@/src/lib/database";
+import { createAuthToken, setAuthCookie } from "@/src/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
