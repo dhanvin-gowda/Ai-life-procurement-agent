@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CarProduct from "./car-product";
 import {
   compareCartItems,
@@ -55,6 +55,16 @@ export interface CartItem {
   product: Product;
   quantity: string;
   addedAt: string;
+  priceSnapshot?: {
+    storeId: string;
+    storeName: string;
+    unitPrice: number;
+    totalItemPrice: number;
+    mrp?: number;
+    deeplink?: string;
+    isLivePrice: boolean;
+    capturedAt: string;
+  };
 }
 
 export interface ProcurementOrder {
@@ -503,6 +513,25 @@ export default function SelectProductClient() {
   // Toast Notification Message State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/cart")
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((data) => {
+        if (!cancelled && data?.items) {
+          setCartItems(data.items.map((item: CartItem) => ({ ...item, id: item.product.id })));
+        }
+      })
+      .catch((error) => console.error("Cart load error:", error));
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Application modal local state
   const [isProcuring, setIsProcuring] = useState(false);
   const [procurementRef, setProcurementRef] = useState("");
@@ -638,7 +667,7 @@ export default function SelectProductClient() {
   };
 
   // --- CART MANAGEMENT HANDLERS ---
-  const handleAddToCart = (product: Product, customQty?: string) => {
+  const handleAddToCart = async (product: Product, customQty?: string) => {
     const qtyStr = customQty || getQuantity(product.id) || "1";
     const isInt = isIntegerOnlyCategory(product.category, product.unit);
 
@@ -650,6 +679,13 @@ export default function SelectProductClient() {
       const parsed = parseFloat(qtyStr);
       sanitizedQty = String(isNaN(parsed) || parsed <= 0 ? 1 : Math.round(parsed * 100) / 100);
     }
+
+    const nextItem = {
+      id: product.id,
+      product,
+      quantity: sanitizedQty,
+      addedAt: new Date().toISOString(),
+    };
 
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((item) => item.product.id === product.id);
@@ -675,16 +711,37 @@ export default function SelectProductClient() {
             id: product.id,
             product,
             quantity: sanitizedQty,
-            addedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            addedAt: nextItem.addedAt,
           },
         ];
       }
     });
 
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product, quantity: sanitizedQty }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          errorData?.error || `Cart save failed (${response.status})`
+        );
+      }
+      const data = await response.json();
+      setCartItems(data.items.map((item: CartItem) => ({ ...item, id: item.product.id })));
+    } catch (error) {
+      console.error("Cart save error:", error);
+      showToast(
+        error instanceof Error ? error.message : "Unable to save item. Please try again."
+      );
+    }
+
     showToast(`Added ${sanitizedQty} ${product.unit} of ${product.name} to Cart`);
   };
 
-  const handleUpdateCartQuantity = (productId: string, newQtyStr: string) => {
+  const handleUpdateCartQuantity = async (productId: string, newQtyStr: string) => {
     const product = PRODUCTS.find((p) => p.id === productId);
     if (!product) return;
     const isInt = isIntegerOnlyCategory(product.category, product.unit);
@@ -698,18 +755,47 @@ export default function SelectProductClient() {
 
     setCartItems((prev) =>
       prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity: sanitized } : item
+        item.product.id === productId
+          ? { ...item, quantity: sanitized, priceSnapshot: undefined }
+          : item
       )
     );
+
+    if (Number(sanitized) > 0) {
+      try {
+        const response = await fetch("/api/cart", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId, quantity: sanitized }),
+        });
+        if (!response.ok) throw new Error("Cart update failed");
+      } catch (error) {
+        console.error("Cart update error:", error);
+      }
+    }
   };
 
-  const handleRemoveFromCart = (productId: string) => {
+  const handleRemoveFromCart = async (productId: string) => {
     setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
+    try {
+      await fetch("/api/cart", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId }),
+      });
+    } catch (error) {
+      console.error("Cart removal error:", error);
+    }
     showToast("Item removed from cart");
   };
 
-  const handleClearCart = () => {
+  const handleClearCart = async () => {
     setCartItems([]);
+    try {
+      await fetch("/api/cart", { method: "DELETE" });
+    } catch (error) {
+      console.error("Cart clear error:", error);
+    }
     showToast("Cart cleared");
   };
 
@@ -720,7 +806,7 @@ export default function SelectProductClient() {
     try {
       const newOrder = await createProcurementOrder(cartItems);
       setProcurementLogs((prev) => [newOrder as any, ...prev]);
-      setCartItems([]);
+      await handleClearCart();
       setProcurementRef(newOrder.reference);
       setIsProcuring(false);
       setActiveTab("procurements");
@@ -741,6 +827,31 @@ export default function SelectProductClient() {
     try {
       const data = await compareCartItems(cartItems);
       setComparisonReport(data);
+      const lowestPriceResult = data.results.find(
+        (result) => result.appName === data.lowestPriceApp
+      );
+      if (lowestPriceResult) {
+        await Promise.all(
+          lowestPriceResult.itemBreakdown.map((item) =>
+            fetch("/api/cart", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                productId: item.productId,
+                priceSnapshot: {
+                  storeId: lowestPriceResult.appId,
+                  storeName: lowestPriceResult.appName,
+                  unitPrice: item.unitPrice,
+                  totalItemPrice: item.totalItemPrice,
+                  mrp: item.mrp,
+                  deeplink: item.deeplink,
+                  isLivePrice: item.isLivePrice === true,
+                },
+              }),
+            })
+          )
+        );
+      }
       showToast("Real-time prices compared across all 11 Quick Commerce apps!");
     } catch (err) {
       console.error("Cart comparison error:", err);
@@ -757,7 +868,7 @@ export default function SelectProductClient() {
     try {
       const newOrder = await createProcurementOrder(cartItems, app.appName);
       setProcurementLogs((prev) => [newOrder as any, ...prev]);
-      setCartItems([]);
+      await handleClearCart();
       setComparisonReport(null);
       setIsProcuring(false);
       setActiveTab("procurements");
